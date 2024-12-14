@@ -10,6 +10,7 @@
     <div class="container">
         <h1>石头剪刀布小游戏</h1>
         <div id="score">得分：<span>0</span></div>
+        <div id="history">战绩：胜 <span class="wins">0</span> 局，平 <span class="draws">0</span> 局，负 <span class="losses">0</span> 局</div>
         
         <div id="message">选择你的选项开始游戏！</div>
         <div id="choices">
@@ -21,8 +22,48 @@
         <div id="selections"></div>
     </div>
 
+    <div id="victory-modal" class="modal">
+        <div class="modal-content">
+            <h2>🎉 哇你太棒了！ 🎉</h2>
+            <p>恭喜你获得10次胜利！</p>
+            <button onclick="closeModal()">继续游戏</button>
+        </div>
+    </div>
+
     <script>
         let score = 0;
+        let wins = 0;
+        let draws = 0;
+        let losses = 0;
+        
+        function updateHistory() {
+            document.querySelector('.wins').textContent = wins;
+            document.querySelector('.draws').textContent = draws;
+            document.querySelector('.losses').textContent = losses;
+        }
+
+        function showVictoryModal() {
+            document.getElementById('victory-modal').style.display = 'flex';
+            createConfetti();
+        }
+
+        function closeModal() {
+            document.getElementById('victory-modal').style.display = 'none';
+        }
+
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                document.body.appendChild(confetti);
+                
+                // 清理礼花
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
         
         function play(playerChoice) {
             // 电脑随机选择
@@ -38,6 +79,7 @@
             if (playerChoice === computerChoice) {
                 result = '平局！';
                 document.getElementById('result').className = 'draw';
+                draws++;
             } else if (
                 (playerChoice === '石头' && computerChoice === '剪刀') ||
                 (playerChoice === '剪刀' && computerChoice === '布') ||
@@ -46,13 +88,20 @@
                 result = '你赢了！';
                 document.getElementById('result').className = 'win';
                 score++;
+                wins++;
                 document.querySelector('#score span').textContent = score;
+                
+                // 检查是否达到10胜
+                if (wins === 10) {
+                    showVictoryModal();
+                }
             } else {
                 result = '你输了！';
                 document.getElementById('result').className = 'lose';
+                losses++;
             }
             
-            // 显示结果
+            updateHistory();
             document.getElementById('result').innerHTML = result;
         }
     </script>
